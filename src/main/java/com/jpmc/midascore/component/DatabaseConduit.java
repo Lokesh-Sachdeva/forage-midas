@@ -4,6 +4,8 @@ import com.jpmc.midascore.entity.UserRecord;
 import com.jpmc.midascore.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class DatabaseConduit {
     private final UserRepository userRepository;
@@ -15,5 +17,12 @@ public class DatabaseConduit {
     public void save(UserRecord userRecord) {
         userRepository.save(userRecord);
     }
-
+    
+    public Optional<UserRecord> findUserById(long id) {
+        return userRepository.findById(id);
+    }
+    
+    public UserRecord findUserByName(String name) {
+        return userRepository.findByName(name);
+    }
 }
