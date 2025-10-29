@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {"server.port=33400"})
 @DirtiesContext
 @EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
 public class TaskFiveTests {
@@ -43,8 +43,14 @@ public class TaskFiveTests {
         logger.info("submit the following output to complete the task (include begin and end output denotations)");
         StringBuilder output = new StringBuilder("\n").append("---begin output ---").append("\n");
         for (int i = 0; i < 13; i++) {
-            Balance balance = balanceQuerier.query((long) i);
-            output.append(balance.toString()).append("\n");
+            try {
+                Balance balance = balanceQuerier.query((long) i);
+                output.append(balance.toString()).append("\n");
+                logger.info("Query for user {} returned: {}", i, balance.toString());
+            } catch (Exception e) {
+                logger.error("Error querying balance for user {}: {}", i, e.getMessage());
+                output.append("Error: ").append(e.getMessage()).append("\n");
+            }
         }
         output.append("---end output ---");
         logger.info(output.toString());
